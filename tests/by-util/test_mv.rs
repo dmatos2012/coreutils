@@ -4,6 +4,10 @@
 // file that was distributed with this source code.
 //
 // spell-checker:ignore mydir
+// spell-checker:ignore samedir
+// spell-checker:ignore Samedir
+// spell-checker:ignore samefile
+// spell-checker:ignore Samefile
 use crate::common::util::TestScenario;
 use filetime::FileTime;
 use std::thread::sleep;
@@ -407,7 +411,7 @@ fn test_mv_same_file() {
 }
 
 #[test]
-#[cfg(all(unix, not(target_os = "android")))]
+// #[cfg(all(unix, not(target_os = "android")))]
 fn test_mv_same_hardlink() {
     let (at, mut ucmd) = at_and_ucmd!();
     let file_a = "test_mv_same_file_a";
@@ -501,7 +505,7 @@ fn test_mv_hardlink_to_symlink() {
 }
 
 #[test]
-#[cfg(all(unix, not(target_os = "android")))]
+// #[cfg(all(unix, not(target_os = "android")))]
 fn test_mv_same_hardlink_backup_simple() {
     let (at, mut ucmd) = at_and_ucmd!();
     let file_a = "test_mv_same_file_a";
@@ -517,7 +521,7 @@ fn test_mv_same_hardlink_backup_simple() {
 }
 
 #[test]
-#[cfg(all(unix, not(target_os = "android")))]
+// #[cfg(all(unix, not(target_os = "android")))]
 fn test_mv_same_hardlink_backup_simple_destroy() {
     let (at, mut ucmd) = at_and_ucmd!();
     let file_a = "test_mv_same_file_a~";
@@ -1413,6 +1417,29 @@ fn test_mv_directory_into_subdirectory_of_itself_fails() {
         .stderr_contains(
             "mv: cannot move 'mydir/' to a subdirectory of itself, 'mydir/mydir_2/mydir/'",
         );
+}
+#[test]
+fn test_mv_same_case_insensitive_file() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    let file1 = "samefile.txt";
+    at.touch(file1);
+    #[cfg(target_os = "linux")]
+    scene.ucmd().arg(file1).arg("Samefile.txt").succeeds();
+    #[cfg(all(not(target_os = "linux")))]
+    scene.ucmd().arg(file1).arg("Samefile.txt").fails();
+}
+#[test]
+#[cfg(not(target_os = "macos"))]
+fn test_mv_same_case_insensitive_dir() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    let file1 = "samedir";
+    at.mkdir(file1);
+    #[cfg(target_os = "linux")]
+    scene.ucmd().arg(file1).arg("Samedir").succeeds();
+    #[cfg(all(not(target_os = "linux")))]
+    scene.ucmd().arg(file1).arg("Samedir").fails();
 }
 // Todo:
 

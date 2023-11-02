@@ -646,9 +646,8 @@ pub fn is_symlink_loop(path: &Path) -> bool {
 }
 
 #[cfg(not(unix))]
-// Hard link comparison is not supported on non-Unix platforms
-pub fn are_hardlinks_to_same_file(_source: &Path, _target: &Path) -> bool {
-    false
+pub fn are_hardlinks_to_same_file(_source: &Path, _target: &Path, same_file: bool) -> bool {
+    same_file
 }
 
 /// Checks if two paths are hard links to the same file.
@@ -662,7 +661,7 @@ pub fn are_hardlinks_to_same_file(_source: &Path, _target: &Path) -> bool {
 ///
 /// * `bool` - Returns `true` if the paths are hard links to the same file, and `false` otherwise.
 #[cfg(unix)]
-pub fn are_hardlinks_to_same_file(source: &Path, target: &Path) -> bool {
+pub fn are_hardlinks_to_same_file(source: &Path, target: &Path, _is_source_same_target: bool) -> bool {
     let source_metadata = match fs::symlink_metadata(source) {
         Ok(metadata) => metadata,
         Err(_) => return false,
